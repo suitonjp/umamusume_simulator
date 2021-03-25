@@ -3,9 +3,25 @@ training_data;
 
 %% シミュレーション設定部
 % 基本設定
-support = [support_list.SpecialWeek, support_list.NaritaTaishin, ...
-           support_list.MihonoBourbon, support_list.AinesuFujin, ...
-           support_list.KiryuinAoi, support_list.VodkaFriend ];
+% support = [support_list.SpecialWeek, support_list.NaritaTaishin, ...
+%            support_list.MihonoBourbon, support_list.AinesuFujin, ...
+%            support_list.KiryuinAoi, support_list.VodkaFriend ];
+
+% % 友人/スピ3/パワー1/賢さ1 
+% support = [support_list.SpecialWeek, support_list.TwinTurboFriend, ...
+%            support_list.TokaiTeioFriend, support_list.VodkaFriend, ...
+%            support_list.HayakawaTazunaFriend, support_list.FineMotionFriend];
+
+% 友人/スピ2/パワー2/賢さ1 
+support = [support_list.SpecialWeek, support_list.TwinTurboFriend, ...
+           support_list.OguriCapFriend, support_list.VodkaFriend, ...
+           support_list.HayakawaTazunaFriend, support_list.FineMotionFriend];
+       
+% 友人/スピ2/パワー1/賢さ1 + タマモクロス
+% support = [support_list.SpecialWeek, support_list.TwinTurboFriend, ...
+%            support_list.TamamoCrossFriend, support_list.VodkaFriend, ...
+%            support_list.HayakawaTazunaFriend, support_list.FineMotionFriend];
+
 
 kizuna_offset = [10, 10, 10, 10, 10, 10];
 training_turn = 65;
@@ -29,9 +45,9 @@ settings.tr.summer = [training_turn-37:training_turn-34, training_turn-14:traini
 % パラメータ評価設定
 settings.param = struct();
 settings.param.weight = [1, 1, 1, 1, 0.8];
-settings.param.goal = [800, 300, 800, 100, 400];
+settings.param.goal = [600, 300, 600, 100, 300];
 settings.param.att_status = true;
-settings.param.att_statust_width = 50; % goalから超過した分は、20%/width の傾きで減衰される
+settings.param.att_statust_width = 100; % goalから超過した分は、20%/width の傾きで減衰される
 
 % その他定数
 settings.tr_data = tr_data;
@@ -62,10 +78,10 @@ clear kizuna_offset fld_name fld val
 
 
 %% シミュレーション 実行
-mode = 2; % 1: seed指定試行, 2: 単体試行, 3: N回試行
-seed = 60;
+mode = 1; % 1: seed指定試行, 2: 単体試行, 3: N回試行
+seed = 5439;
 
-N = 3000;
+N = 10000;
 results = zeros(N, 5);
 
 switch mode 
@@ -77,6 +93,15 @@ switch mode
         for num = 1:N
             results(num, :) = run_umasimu(support, settings, num, false);
         end
+        scores = sum(results .* settings.param.weight, 2);
+        histfit(scores, 50);
+        grid on
+        pd = fitdist(scores, 'Normal');
+        [d, idx] = max(sum(results, 2));
+        
+        fprintf("平均: %.2f, 中央値: %.2f | 正規分布 mu: %.2f, sigma: %.2f\n", ...
+            mean(scores), median(scores), pd.mu, pd.sigma);
+        fprintf("最大評価: %d, Seed: %d \n", d, idx);
 end
 
 

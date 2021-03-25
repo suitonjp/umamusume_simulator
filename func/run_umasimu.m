@@ -33,7 +33,7 @@ function result = run_umasimu(support, settings, seed, vb)
 
         % Å‚•]‰¿‚ÌƒgƒŒ[ƒjƒ“ƒO‚ÌÀ{
         if vb
-            fprintf("Turn: %d , %s (•]‰¿“_: %.2f) \n", i, settings.tr_type_list(idx), m);
+            fprintf("Turn: %d , %s (•]‰¿“_: %.2f) ", i, settings.tr_type_list(idx), m);
 %             evaluate_training(settings.tr_type_list(idx), support, settings, true);
         end
         [support, settings] = execute_training(settings.tr_type_list(idx), support, settings, vb);
